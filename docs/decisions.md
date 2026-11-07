@@ -1,0 +1,58 @@
+# Pembahasan dan keputusan — LLM cost proxy
+
+## Status keputusan
+
+Usulan kill; belum disetujui. Skor dan klaim pasar pada triage adalah **ASUMSI**, bukan riset pasar. Repo dibuat atas permintaan dokumentasi semua project pada 7 November 2026; bukan instruksi menjalankan wave atau membatalkan usulan merge/kill.
+
+Prioritas sumber: keputusan Thomas terbaru → tabel stack revisi dan pendukung → catatan review historis → brainstorm. Catatan historis di bawah tidak boleh membatalkan koreksi terbaru.
+
+## Keputusan dan batas draf
+
+- **Arahan Thomas:** terapkan rekomendasi review pada dokumen, pertahankan diversitas, jangan coding. Kecocokan stack lebih penting daripada kuota; sedikit variasi yang bermakna dapat diterima. Batas lama dua penggunaan dan beda 4/8 bukan alasan otomatis mengganti stack. Bahasa/framework utama tetap bervariasi; tidak menambah komponen tanpa kebutuhan. Perubahan ini terbatas pada artifact, bukan sinkronisasi aturan repository atau registry stack final.
+- Thomas membolehkan **Go core + TS interface** maupun **Rust core + TS interface**, dengan minat lebih besar pada Rust. Interface TS tidak harus berarti backend TS tambahan.
+- Semua **135 ide tetap terlihat**, termasuk 7 usulan merge dan 11 usulan kill. Status itu belum keputusan final; kandidat standalone untuk mereka bersifat kondisional.
+- Kategori 2/3/6 tetap memakai aplikasi utama TS/Go; Rust boleh menjadi core komputasi terbatas yang disebutkan eksplisit. Kategori 7/8 selalu mempunyai bahasa eksplorasi dengan tugas nyata. Ini interpretasi desain, bukan izin mengganti seluruh backend bisnis menjadi Rust.
+- Pilihan utama = rekomendasi awal berdasarkan brief enam baris, belum berdasarkan PRD lengkap. Versi, lisensi, maintenance, biaya, kompatibilitas semua kombinasi, dan kelulusan e2e belum dibuktikan.
+- Tidak ada keputusan wave, merge/kill, produksi, atau pengeluaran uang yang dibuat melalui dokumen ini. Registry final tidak diubah.
+
+## Keputusan Thomas setelah pembahasan stack pendukung
+
+Thomas menyetujui rekomendasi pembahasan pada 7 November 2026 dan meminta seluruh stack pendukung dilengkapi, tetap tanpa coding. Persetujuan mencakup:
+
+- Palette merupakan daftar pilihan, bukan kewajiban memakai semua teknologi. Diversitas utama dipertahankan; auth, query tooling, monorepo, dan observability boleh berulang ketika cocok.
+- Phoenix, Reitit, Giraffe, Wisp, Kemal dan SQLite standalone diizinkan sebagai kandidat. Ini bukan approval otomatis semua versi, dependency turunan, instalasi, atau biaya.
+- 815: web memakai template tepercaya dan data tervalidasi; CLI boleh menjalankan kode milik operator. Hosted arbitrary user code tidak masuk baseline.
+- 713: draft boleh offline; penerimaan final diputuskan server melalui finalisasi idempotent dan receipt. Submit setelah deadline menunggu keputusan pengawas, bukan otomatis diterima; jam perangkat bukan bukti waktu penyerahan. Keputusan pengawas harus tercatat, tanpa mengganti waktu penerimaan asli.
+- 716/813/809: offline mencakup tutup dan buka ulang setelah data/aset siap tersimpan; storage browser tetap bisa hilang dan perlu pesan pemulihan.
+- 212: PostgreSQL menjadi baseline dengan asumsi belum ada integrasi MySQL wajib; MySQL tetap alternatif dengan inventaris sync lengkap.
+- Lengkapi pilihan auth/otorisasi, data/migrasi, runtime/kontrak, komponen khusus dan operasional seluruh project sebagai rencana, bukan kelulusan pengujian.
+
+Wave, merge/kill, pembelian, aktivasi layanan dan deployment tetap tidak disetujui melalui keputusan ini. Aturan lama di repository/skills belum disinkronkan; registry final tetap tidak diubah.
+
+## Kutipan triage khusus project
+
+## Kill list
+
+| Idea | Reason |
+| --- | --- |
+| `117-llm-cost-proxy` | Cukup pakai LiteLLM atau Helicone, tidak perlu dibangun |
+
+## Pertimbangan percakapan awal
+
+Tidak ada PRD final atau keputusan desain per project yang ditemukan.
+
+## Ringkasan brainstorm awal
+
+Proxy OpenAI-compatible mencatat biaya project; pengguna LLM; ramai LiteLLM/Helicone; laporan biaya gate factory.
+
+Sumber: artifact brainstorm revisi 1 (6 November 2026), ditautkan di sources.md. Ini bahan ide, bukan scope MVP atau riset terverifikasi; klaim pasar, kompetitor, tarif dan regulasi adalah **ASUMSI**. Koreksi keputusan terbaru tetap berlaku.
+
+## Hasil review yang menyebut project ini
+
+| Temuan | Keputusan yang diterapkan dalam dokumen | Yang masih harus diputuskan atau dibuktikan |
+| --- | --- | --- |
+| R14 · 117 | HTTP proxy inference dipisah dari Connect control API, pada project yang tetap kondisional | Provider dan tingkat drop-in compatibility belum dikunci; usulan kill belum diputuskan |
+
+## Riwayat review (bukan instruksi mengganti keputusan terbaru)
+
+- **R14 · 117 LLM cost proxy:** jika ingin kompatibel dengan SDK provider hanya lewat penggantian base URL, sediakan handler HTTP/provider-compatible dan framing streaming yang sesuai; Connect boleh tetap untuk control API/dashboard di proses Go yang sama. [Connect](https://connectrpc.com/docs/go/getting-started/) memakai schema Protobuf/protokol RPC; [OpenAI streaming](https://platform.openai.com/docs/guides/streaming-responses) mendokumentasikan SSE. Drop-in compatibility belum menjadi requirement eksplisit, sehingga ini keputusan kontrak, bukan alasan mengganti Go.
